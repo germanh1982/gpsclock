@@ -7,7 +7,7 @@ class Brightness(Enum):
     LOW = 3
 
 class VFD:
-    CMDTIME = 1e-3
+    CMDTIME = 2e-3
 
     def __init__(self, rs, e, db7, db6, db5, db4, rows, cols):
         self._rs = rs
