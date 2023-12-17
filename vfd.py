@@ -126,18 +126,8 @@ class VFD:
             if y is None:
                 continue
 
-            setpos = False
-
-            if x == 0 or x % self._cols == 0:
-                setpos = True
-
-            elif differences[x-1] is None:
-                setpos = True
-
-            else:
-                setpos = False
-
-            if setpos:
+            if x % self._cols == 0 or differences[x-1] is None:
+                # set position before write
                 row = int(x / self._cols)
                 col = x % self._cols
                 self._cursor_pos(row, col)
