@@ -9,7 +9,7 @@ from time import monotonic
 State = Enum('State', ['BATT', 'GPSPOS'])
 
 class Main:
-    UPDATE_RATE = 0.01
+    UPDATE_RATE = 0.05
     PAGE_DELAY = 5
 
     def __init__(self):
