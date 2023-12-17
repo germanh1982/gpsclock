@@ -20,7 +20,7 @@ class VFD:
         self._rows = rows
         self._cols = cols
         self._currfb = [' '] * cols * rows
-        self._newfb = [' '] * cols * rows
+        self.clearbuf()
         self._fbpointer = [0, 0]
 
         GPIO.setwarnings(False)
@@ -83,6 +83,9 @@ class VFD:
 
     def home(self):
         self._send(0, 0x2)
+
+    def clearbuf(self):
+        self._newfb = [' '] * len(self._currfb)
 
     def entry_mode_set(self, idd, s):
         self._send(0, 0x4 | idd << 1 | s)

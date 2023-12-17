@@ -53,6 +53,7 @@ class Main:
 
     def render(self):
         #self.disp.clear()
+        self.disp.clearbuf()
         self.disp.setpos(0, 0)
         self.disp.write(self.render_datetime())
 
