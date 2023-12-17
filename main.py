@@ -5,7 +5,7 @@ from vfd import VFD, Brightness
 from batt_gauge import MAX17040
 
 class Main:
-    UPDATE_RATE = 0.1
+    UPDATE_RATE = 0.01
 
     def __init__(self):
         RS = 4
@@ -67,6 +67,9 @@ class Main:
             sleep(self.UPDATE_RATE)
 
 if __name__ == '__main__':
-    with Main() as main:
-        main.loop_forever()
+    try:
+        with Main() as main:
+            main.loop_forever()
+    except KeyboardInterrupt:
+        pass
 
