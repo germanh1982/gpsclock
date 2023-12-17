@@ -1,7 +1,7 @@
 from time import sleep
 import datetime
 import gpsd
-from vfd import VFD, Brightness
+from vfd import BufferedVFD, Brightness, Direction
 from batt_gauge import MAX17040
 from enum import Enum
 from time import monotonic
@@ -22,7 +22,7 @@ class Main:
 
         self.batt = MAX17040(1)
 
-        self.disp = VFD(RS, E, DB7, DB6, DB5, DB4, rows=2, cols=24)
+        self.disp = BufferedVFD(RS, E, DB7, DB6, DB5, DB4)
         self.disp.initialize()
         self.disp.control(display=1, cursor=0, blink=0)
         self.disp.brightness(Brightness.LOW)
@@ -60,7 +60,7 @@ class Main:
 
     def render(self):
         #self.disp.clear()
-        self.disp.clearbuf()
+        self.disp.clear()
         self.disp.setpos(0, 0)
         self.disp.write(self.render_datetime())
 
