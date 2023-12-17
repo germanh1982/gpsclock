@@ -3,9 +3,14 @@ import datetime
 import gpsd
 from vfd import VFD, Brightness
 from batt_gauge import MAX17040
+from enum import Enum
+from time import monotonic
+
+State = Enum('State', ['BATT', 'GPSPOS'])
 
 class Main:
     UPDATE_RATE = 0.01
+    PAGE_DELAY = 5
 
     def __init__(self):
         RS = 4
@@ -23,6 +28,8 @@ class Main:
         self.disp.brightness(Brightness.LOW)
 
         gpsd.connect()
+
+        self._state = State.BATT
 
     def __enter__(self):
         return self
@@ -58,12 +65,23 @@ class Main:
         self.disp.write(self.render_datetime())
 
         self.disp.setpos(1,0)
-        self.disp.write(self.render_batt())
+        if self._state is State.BATT:
+            self.disp.write(self.render_batt())
+        elif self._state is State.GPSPOS:
+            self.disp.write(self.render_pos())
 
         self.disp.update()
 
     def loop_forever(self):
+        last_state_change = monotonic()
         while True:
+            if monotonic() - last_state_change > self.PAGE_DELAY:
+                last_state_change = monotonic()
+                if self._state is State.BATT:
+                    self._state = State.GPSPOS
+                elif self._state is State.GPSPOS:
+                    self._state = State.BATT
+
             self.render()
             sleep(self.UPDATE_RATE)
 
