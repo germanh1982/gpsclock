@@ -9,13 +9,19 @@ class Brightness(Enum):
 class VFD:
     CMDTIME = 1e-3
 
-    def __init__(self, rs, e, db7, db6, db5, db4):
+    def __init__(self, rs, e, db7, db6, db5, db4, rows, cols):
         self._rs = rs
         self._e = e
         self._db7 = db7
         self._db6 = db6
         self._db5 = db5
         self._db4 = db4
+
+        self._rows = rows
+        self._cols = cols
+        self._currfb = [' '] * cols * rows
+        self._newfb = [' '] * cols * rows
+        self._fbpointer = [0, 0]
 
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
@@ -53,8 +59,10 @@ class VFD:
         self._send4(rsv, data8 & 0xf)
         sleep(self.CMDTIME)
 
+    """
     def write(self, string):
         for c in string: self.writechr(c)
+    """
 
     def writechr(self, ch):
         self._send(1, ord(ch))
@@ -90,8 +98,48 @@ class VFD:
         self._send4(0, 0x20)
         self._send(1, brightness.value)
 
-    def cursor_position(self, row, col):
+    def _cursor_pos(self, row, col):
         addr = row * 0x40 + col
         self._send(0, 0x80 | addr)
 
+    def setpos(self, row, col):
+        self._fbpointer = row * self._cols + col
+
+    def write(self, st):
+        fr = self._fbpointer
+        to = fr + len(st)
+        self._newfb[fr:to] = list(st)
+        self._fbpointer = to
+
+    def update(self):
+        differences = [None] * len(self._currfb)
+        # find what to update
+        for x in range(len(self._currfb)):
+            if self._currfb[x] != self._newfb[x]:
+                differences[x] = self._newfb[x]
+
+        # update character positions that changed
+        for x, y in enumerate(differences):
+            if y is None:
+                continue
+
+            setpos = False
+
+            if x == 0 or x % self._cols == 0:
+                setpos = True
+
+            elif differences[x-1] is None:
+                setpos = True
+
+            else:
+                setpos = False
+
+            if setpos:
+                row = int(x / self._cols)
+                col = x % self._cols
+                self._cursor_pos(row, col)
+
+            self.writechr(y)
+
+        self._currfb = self._newfb[:]
 

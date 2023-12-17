@@ -17,7 +17,7 @@ class Main:
 
         self.batt = MAX17040(1)
 
-        self.disp = VFD(RS, E, DB7, DB6, DB5, DB4)
+        self.disp = VFD(RS, E, DB7, DB6, DB5, DB4, rows=2, cols=24)
         self.disp.initialize()
         self.disp.control(display=1, cursor=0, blink=0)
         self.disp.brightness(Brightness.LOW)
@@ -52,12 +52,14 @@ class Main:
         return datetime.datetime.now().strftime('%c')
 
     def render(self):
-        self.disp.clear()
-        self.disp.home()
+        #self.disp.clear()
+        self.disp.setpos(0, 0)
         self.disp.write(self.render_datetime())
-        self.disp.cursor_position(1,0)
 
+        self.disp.setpos(1,0)
         self.disp.write(self.render_batt())
+
+        self.disp.update()
 
     def loop_forever(self):
         while True:
