@@ -11,6 +11,7 @@ State = Enum('State', ['BATT', 'GPSPOS'])
 class Main:
     UPDATE_RATE = 0.05
     PAGE_DELAY = 5
+    SCROLL_INTERVAL = 0.5
 
     def __init__(self):
         RS = 4
@@ -74,6 +75,7 @@ class Main:
 
     def loop_forever(self):
         last_state_change = monotonic()
+        last_shift = monotonic()
         while True:
             if monotonic() - last_state_change > self.PAGE_DELAY:
                 last_state_change = monotonic()
@@ -81,6 +83,10 @@ class Main:
                     self._state = State.GPSPOS
                 elif self._state is State.GPSPOS:
                     self._state = State.BATT
+
+            if monotonic() - last_shift > self.SCROLL_INTERVAL:
+                last_shift = monotonic()
+                self.disp.shift_display(Direction.LEFT)
 
             self.render()
             sleep(self.UPDATE_RATE)
