@@ -6,6 +6,7 @@ from vfd import BufferedVFD, Brightness, Direction
 from batt_gauge import MAX17040
 from enum import Enum
 from time import monotonic
+import signal
 
 State = Enum('State', ['BATT', 'GPSPOS'])
 
@@ -15,6 +16,8 @@ class Main:
     SCROLL_INTERVAL = 0.5
 
     def __init__(self):
+        self.stopped = False
+
         RS = 4
         E = 27
         DB7 = 19
@@ -37,7 +40,11 @@ class Main:
         return self
 
     def __exit__(self, etyp, ev, etb):
+        self.exit()
+
+    def exit(self):
         self.disp.control(display=0, cursor=0, blink=0)
+        self.stopped = True
 
     def render_pos(self):
         packet = gpsd.get_current()
@@ -77,7 +84,7 @@ class Main:
     def loop_forever(self):
         last_state_change = monotonic()
         last_shift = monotonic()
-        while True:
+        while not self.stopped:
             if monotonic() - last_state_change > self.PAGE_DELAY:
                 last_state_change = monotonic()
                 if self._state is State.BATT:
@@ -93,8 +100,14 @@ class Main:
             sleep(self.UPDATE_RATE)
 
 if __name__ == '__main__':
+    main = Main()
+
     try:
-        with Main() as main:
+        with main:
+            def sigterm_handler(signum, stackframe):
+                main.exit()
+            signal.signal(signal.SIGTERM, sigterm_handler)
+    
             main.loop_forever()
     except KeyboardInterrupt:
         pass
