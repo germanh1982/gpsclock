@@ -19,11 +19,11 @@ class Main:
         self.stopped = False
 
         RS = 4
-        E = 27
-        DB7 = 19
-        DB6 = 13
-        DB5 = 6
-        DB4 = 5
+        E = 17
+        DB4 = 22
+        DB5 = 23
+        DB6 = 24
+        DB7 = 25
 
         self.batt = MAX17040(1)
 
