@@ -1,3 +1,4 @@
+#!/opt/gpsclock/bin/python3
 from time import sleep
 import datetime
 import gpsd
