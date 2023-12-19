@@ -11,7 +11,7 @@ class Direction(Enum):
     RIGHT = 1
 
 class NoritakeCharVFD:
-    CMDTIME = 2e-3 # time to complete a command
+    CMDTIME = 1e-3 # time to complete a command
     LINE_OFFSET = 64 # this is the offset between the first and second line in the HD44780 DDRAM memory mapping
     LINES = 2 # number of framebuffer lines, also defined by the driver memory map.
 
