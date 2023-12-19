@@ -42,7 +42,7 @@ class NoritakeCharVFD:
         self._function_set(i_f=1)
         self._function_set(i_f=1)
 
-        self._function_set()
+        self._function_set(i_f=0)
         self.brightness(Brightness.HIGH)
         self.entry_mode_set(idd=1, s=0)
         self.clear_screen()
@@ -86,11 +86,11 @@ class NoritakeCharVFD:
     def control(self, display, cursor, blink):
         self._send(0, 0x8 | display << 2 | cursor << 1 | blink)
 
-    def _function_set(self, i_f=0):
-        self._send4(0, 0x2 | i_f << 4)
+    def _function_set(self, i_f):
+        self._send4(0, 0x2 | i_f)
 
     def brightness(self, brightness):
-        self._function_set()
+        self._function_set(i_f=0)
         self._send4(0, 0x20)
         self._send(1, brightness.value)
 
